@@ -1,0 +1,33 @@
+---
+- name: miracle zabbix install
+  hosts: all
+  become: yes
+  tasks:
+    - name: pgp key install 
+      command: rpm --import https://ftp.miraclelinux.com/zbx/RPM-GPG-KEY-MIRACLE
+      
+    - name: yum repo install    
+      command: rpm -ihv https://ftp.miraclelinux.com/zbx/5.0/miracle-zbx-release-5.0-1.noarch.rpm
+
+    - name: add allow port firewalld to 10051/tcp
+      firewalld: 
+        permanent: True
+        port: 10051/tcp
+        state: enabled
+        immediate: yes
+        
+    - name: add allow port firewalld to 161/tcp
+      firewalld: 
+        permanent: True
+        port: 161/tcp
+        state: enabled
+        immediate: yes
+        
+   - name: firewalld reload
+      command: firewall-cmd --reload
+      
+   - name: miracle-zbx-server-mysql install
+      yum:
+        name:
+          - miracle-zbx-server-mysql
+        state: latest
